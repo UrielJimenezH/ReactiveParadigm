@@ -6,6 +6,7 @@ import com.reactiveparadigm.reactiveParadigm.service.UserService;
 import com.reactiveparadigm.reactiveParadigm.utils.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,7 +19,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<UserDto> getAllUsers(
             @RequestHeader("X-REQUEST-ID") String requestId
     ) {
@@ -26,7 +27,7 @@ public class UserController {
 	            .contextWrite(Context.of(Log.requestIdKey, requestId));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Mono<UserDto> getUser(
             @RequestHeader("X-REQUEST-ID") String requestId,
             @PathVariable String id
@@ -35,7 +36,7 @@ public class UserController {
                 .contextWrite(Context.of(Log.requestIdKey, requestId));
     }
 
-    @GetMapping("/{id}/orders")
+    @GetMapping(value = "/{id}/orders", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<OrderInfoDto> getUserOrdersInfo(
             @RequestHeader("X-REQUEST-ID") String requestId,
             @PathVariable String id
