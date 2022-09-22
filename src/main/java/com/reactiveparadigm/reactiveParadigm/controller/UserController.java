@@ -20,43 +20,27 @@ public class UserController {
 
     @GetMapping
     public Flux<UserDto> getAllUsers(
-            @RequestHeader("X-REQUEST-ID") String reqId
+            @RequestHeader("X-REQUEST-ID") String requestId
     ) {
-        String requestId = reqId == null ? "" : reqId;
-
-        return Mono.just(String.format("finding all users for requestId  '%s'", requestId))
-                .doOnEach(Log.logOnNext(log::info))
-                .thenMany(userService.getAllUsers())
-                .doOnEach(Log.logOnNext(userOrderInfo -> log.info("found user {}", userOrderInfo)))
+        return userService.getAllUsers()
 	            .contextWrite(Context.of(Log.requestIdKey, requestId));
     }
 
     @GetMapping("/{id}")
     public Mono<UserDto> getUser(
-            @RequestHeader("X-REQUEST-ID") String reqId,
+            @RequestHeader("X-REQUEST-ID") String requestId,
             @PathVariable String id
     ) {
-        String requestId = reqId == null ? "" : reqId;
-
-        return Mono.just(String.format("finding user for id '%s' for requestId '%s'", id, requestId))
-                .doOnEach(Log.logOnNext(log::info))
-                .then(userService.getUser(id))
-                .doOnEach(Log.logOnNext(user -> log.info("found user {}", user)))
+        return userService.getUser(id)
                 .contextWrite(Context.of(Log.requestIdKey, requestId));
     }
 
     @GetMapping("/{id}/orders")
     public Flux<OrderInfoDto> getUserOrdersInfo(
-            @RequestHeader("X-REQUEST-ID") String reqId,
+            @RequestHeader("X-REQUEST-ID") String requestId,
             @PathVariable String id
     ) {
-        String requestId = reqId == null ? "" : reqId;
-
-        return Mono.just(String.format("finding user for id '%s' for requestId '%s'", id, requestId))
-                .doOnEach(Log.logOnNext(log::info))
-                .thenMany(userService.getUserOrdersInfo(id, requestId))
-                .doOnEach(Log.logOnNext(user -> log.info("found user order info {}", user)))
+        return userService.getUserOrdersInfo(id)
                 .contextWrite(Context.of(Log.requestIdKey, requestId));
     }
-
 }

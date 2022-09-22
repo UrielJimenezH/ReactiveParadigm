@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
+import reactor.core.scheduler.Schedulers;
 import java.time.Duration;
 
 @Service
@@ -18,8 +18,8 @@ public class ProductService {
             .baseUrl("http://localhost:8082/productInfoService")
             .build();
 
-    public Mono<ProductDto> getProductWithHighestScore(String productCode, String requestId) {
-        return productInfoServiceClient.get()
+    public Mono<ProductDto> getProductWithHighestScore(String productCode) {
+        Mono<ProductDto> productMono = productInfoServiceClient.get()
                 .uri(getProductInfoServiceUri(productCode))
                 .retrieve()
                 .bodyToFlux(ProductDto.class)
@@ -29,7 +29,11 @@ public class ProductService {
                 .sort((p1, p2) -> p2.getScore().compareTo(p1.getScore()))
                 .next()
                 .onErrorResume(RuntimeException.class, (ex) -> Mono.just(new ProductDto()))
-                .contextWrite(Context.of(Log.requestIdKey, requestId));
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.just(String.format("finding products for productCode '%s'", productCode))
+                .doOnEach(Log.logOnNext(log::info))
+                .then(productMono);
     }
 
     private String getProductInfoServiceUri(String productCode) {
