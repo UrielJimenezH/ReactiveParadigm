@@ -21,7 +21,8 @@ public class OrderService {
                 .uri(getOrderSearchServiceUri(phoneNumber))
                 .retrieve()
                 .bodyToFlux(OrderDto.class)
-                .doOnEach(Log.logOnNext(orderDto -> log.info("found order {}", orderDto)));
+                .doOnEach(Log.logOnNext(orderDto -> log.info("found order {}", orderDto)))
+                .onErrorResume((ex) -> Flux.empty());
 
         return Mono.just(String.format("finding orders for user with phoneNumber '%s'", phoneNumber))
                 .doOnEach(Log.logOnNext(log::info))
@@ -31,7 +32,7 @@ public class OrderService {
     private String getOrderSearchServiceUri(String phoneNumber) {
         return UriComponentsBuilder.fromUriString("/order/phone")
                 .queryParam("phoneNumber", phoneNumber)
-                .buildAndExpand()
+                .build()
                 .toUriString();
     }
 }

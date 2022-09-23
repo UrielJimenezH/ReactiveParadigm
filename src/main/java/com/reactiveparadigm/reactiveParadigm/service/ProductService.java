@@ -28,8 +28,7 @@ public class ProductService {
                 .doOnEach(Log.logOnError(throwable -> log.error("Exception happened: ", throwable)))
                 .sort((p1, p2) -> p2.getScore().compareTo(p1.getScore()))
                 .next()
-                .onErrorResume(RuntimeException.class, (ex) -> Mono.just(new ProductDto()))
-                .subscribeOn(Schedulers.boundedElastic());
+                .onErrorResume((ex) -> Mono.empty());
 
         return Mono.just(String.format("finding products for productCode '%s'", productCode))
                 .doOnEach(Log.logOnNext(log::info))
