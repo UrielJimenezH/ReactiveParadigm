@@ -8,7 +8,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import java.time.Duration;
 
 @Service
@@ -28,7 +27,7 @@ public class ProductService {
                 .doOnEach(Log.logOnError(throwable -> log.error("Exception happened: ", throwable)))
                 .sort((p1, p2) -> p2.getScore().compareTo(p1.getScore()))
                 .next()
-                .onErrorResume((ex) -> Mono.empty());
+                .onErrorResume((ex) -> Mono.just(new ProductDto()));
 
         return Mono.just(String.format("finding products for productCode '%s'", productCode))
                 .doOnEach(Log.logOnNext(log::info))

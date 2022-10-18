@@ -16,12 +16,13 @@ import reactor.util.context.Context;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
+    private final static String REQUEST_ID_HEADER_KEY = "X-REQUEST-ID";
     @Autowired
     private UserService userService;
 
     @GetMapping(produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<UserDto> getAllUsers(
-            @RequestHeader("X-REQUEST-ID") String requestId
+            @RequestHeader(REQUEST_ID_HEADER_KEY) String requestId
     ) {
         return userService.getAllUsers()
 	            .contextWrite(Context.of(Log.requestIdKey, requestId));
@@ -29,7 +30,7 @@ public class UserController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Mono<UserDto> getUser(
-            @RequestHeader("X-REQUEST-ID") String requestId,
+            @RequestHeader(REQUEST_ID_HEADER_KEY) String requestId,
             @PathVariable String id
     ) {
         return userService.getUser(id)
@@ -38,7 +39,7 @@ public class UserController {
 
     @GetMapping(value = "/{id}/orders", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<OrderInfoDto> getUserOrdersInfo(
-            @RequestHeader("X-REQUEST-ID") String requestId,
+            @RequestHeader(REQUEST_ID_HEADER_KEY) String requestId,
             @PathVariable String id
     ) {
         return userService.getUserOrdersInfo(id)

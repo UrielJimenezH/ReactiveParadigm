@@ -43,7 +43,6 @@ public class OrderServiceTest {
                 .withStatus(HttpStatus.OK.value())
                 .withHeader(contentTypeHeaderKey, MediaType.APPLICATION_NDJSON_VALUE)
                 .withBodyFile("responses/orders.ndjson");
-//                .withLogNormalRandomDelay(9000, 0.1);
 
         WireMock.stubFor(WireMock.get(endpoint + "?" + phoneNumberParamKey + "=" + phoneNumber)
 //                .withQueryParam(phoneNumberParamKey, equalTo("123456789"))
